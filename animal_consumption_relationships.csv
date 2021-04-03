@@ -1,0 +1,20 @@
+#animal,consumed by,frequency of consumption
+grasshopper,rat,0.5
+grasshopper,frog,0.5
+butterfly,frog,0.3
+butterfly,dragonfly,0.7
+fruit fly,frog,0.3
+fruit fly,dragonfly,0.6
+fruit fly,thrush,0.1
+rat,python,0.5
+rat,wolf,0.2
+rat,eagle,0.3
+frog,python,0.7
+frog,eagle,0.3
+dragonfly,frog,0.6
+dragonfly,thrush,0.4
+thrush,wolf,0.15
+thrush,eagle,0.85
+python,eagle,1
+wolf,python,0.2
+wolf,eagle,0.8
