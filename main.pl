@@ -2,6 +2,7 @@
 :- [animal_abundances].
 :- [animal_produced_energies].
 :- [animal_consumed_energies].
+:- [animal_consumption_relationships].
 
 
 % total_energy_consumed_by(Animal, Total_Produced) is true if Animal is paired up
@@ -34,3 +35,11 @@ total_energy_consumed_csv(Animal, Total_Consumed) :-
 total_energy_consumed_by_abundance(Animal, Abundance, Total_Consumed) :-
     produced_energy(Animal, ConsumedEnergy),
     Total_Consumed is Abundance*ConsumedEnergy.
+
+animal_ok(Animal) :- animal_consumption_relationships(ConsumptionRelationships), total_energy_consumed_csv(Animal, ConsumedEnergy), animal_ok_helper(Animal, ConsumedEnergy, ConsumptionRelationships).
+
+animal_ok_helper(Animal, RemainingEnergyReq, _) :- RemainingEnergyReq =< 0.
+animal_ok_helper(Animal1, RemainingEnergyReq, [consumption(_, Animal2, _)|T]) :- dif(Animal1, Animal2), animal_ok_helper(Animal1, RemainingEnergyReq, T).
+animal_ok_helper(Animal, RemainingEnergyReq, [consumption(ConsumedAnimal, Animal, Freq)|T]) :- total_energy_produced_csv(ConsumedAnimal, Total_Produced), animal_ok_helper(Animal, (RemainingEnergyReq-(Total_Produced*Freq)), T).
+
+
