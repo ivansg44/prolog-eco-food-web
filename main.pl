@@ -36,10 +36,14 @@ total_energy_consumed_by_abundance(Animal, Abundance, Total_Consumed) :-
     produced_energy(Animal, ConsumedEnergy),
     Total_Consumed is Abundance*ConsumedEnergy.
 
+system_ok :- animal_abundances(Abundances), system_ok_helper(Abundances).
+
+system_ok_helper([]).
+system_ok_helper([abundance(Animal, _)|T]) :- animal_ok(Animal), system_ok_helper(T).
+
 animal_ok(Animal) :- animal_consumption_relationships(ConsumptionRelationships), total_energy_consumed_csv(Animal, ConsumedEnergy), animal_ok_helper(Animal, ConsumedEnergy, ConsumptionRelationships).
 
 animal_ok_helper(Animal, RemainingEnergyReq, _) :- RemainingEnergyReq =< 0.
 animal_ok_helper(Animal1, RemainingEnergyReq, [consumption(_, Animal2, _)|T]) :- dif(Animal1, Animal2), animal_ok_helper(Animal1, RemainingEnergyReq, T).
 animal_ok_helper(Animal, RemainingEnergyReq, [consumption(ConsumedAnimal, Animal, Freq)|T]) :- total_energy_produced_csv(ConsumedAnimal, Total_Produced), animal_ok_helper(Animal, (RemainingEnergyReq-(Total_Produced*Freq)), T).
-
 
