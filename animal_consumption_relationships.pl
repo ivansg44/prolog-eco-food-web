@@ -47,3 +47,20 @@ predators_helper(Prey1, [consumption(Prey2, Predator, _)|T1], T2) :-
     dif(Prey1, Prey2),
     predators_helper(Prey1, T1, T2).
 
+% prey(Predator, Prey) is true if Prey is a list of animals that Prey consumes,
+% as described in "animal_consumption_relationships.csv".
+prey(Predator, Prey) :-
+    animal_consumption_relationships(ConsumptionRelationships),
+    prey_helper(Predator, ConsumptionRelationships, Prey).
+
+% prey_helper(Predator, ConsumptionRelationships, Prey) is true if Prey is a
+% list of animals from ConsumptionRelationships that Predator consumes.
+prey_helper(Predator, [], []).
+prey_helper(Predator,
+            [consumption(Prey, Predator, _)|T1],
+            [Prey|T2]) :-
+    prey_helper(Predator, T1, T2).
+prey_helper(Predator1, [consumption(Prey, Predator2, _)|T1], T2) :-
+    dif(Predator1, Predator2),
+    prey_helper(Predator1, T1, T2).
+
