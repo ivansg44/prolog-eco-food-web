@@ -69,3 +69,49 @@ animal_ok_helper(Animal,
     total_energy_produced_csv(ConsumedAnimal, Total_Produced),
     animal_ok_helper(Animal, (RemainingEnergyReq-(Total_Produced*Freq)), T).
 
+
+
+% available_energy_from_single_prey(Predator, Prey, Conusmedenergy) is true if the AvailableEnergy is 
+% equal to the TotalProducedEnergy*Freq given from the csv files.
+available_energy_from_single_prey(Predator, Prey, AvailableEnergy) :-
+    total_energy_produced_csv(Prey, TotalProducedEnergy),
+    consumption(Prey, Predator, Freq),
+    AvailableEnergy is TotalProducedEnergy*Freq.
+    
+
+
+% available_energy_list(Predator, PreyList, AvailableEnergy) is true if the Predator is matched up with
+% all its prey and their available energy as calcualted from available_energy_from_single_prey predicate
+available_energy_list(Predator, PreyList, AvailableEnergyList) :-
+    prey(Predator, PreyList),
+    available_energy_list_helper(Predator, PreyList, AvailableEnergyList).
+
+available_energy_list_helper(Predator, [], []).
+available_energy_list_helper(Predator, [Prey|T1], [Energy|T2]) :-
+    available_energy_from_single_prey(Predator, Prey, Energy),
+    available_energy_list_helper(Predator, T1, T2).
+
+
+% sum_available_energy_list(Predator, TotalAvailableEnergy) is true if the TotalAvailableEnergy is the sum
+% of all the available energies from a predator's preylist
+sum_available_energy_list(Predator, TotalAvailableEnergy) :-
+    prey(Predator, PreyList),
+    available_energy_list(Predator, PreyList, AvailableEnergyList),
+    sum(AvailableEnergyList, TotalAvailableEnergy).
+
+
+% max_allowable_abundance(Predator, MaxAbundance) returns true if MaxAbundance is equal to the TotalAvailableEnergy
+% divided by the SingleEnergyRequirement (rounded down)
+max_allowable_abundance(Predator, MaxAbundance) :-
+    consumed_energy(Predator, SingleEnergyRequirement),
+    sum_available_energy_list(Predator, TotalAvailableEnergy),
+    MaxAbundance is floor(TotalAvailableEnergy/SingleEnergyRequirement).
+
+
+
+% From Lecture
+% sum(L,S) is true if S is the sum of the elements of numerical list L
+sum([],0).
+sum([H|T],S) :-
+    sum(T,ST),
+    S is H+ST.
