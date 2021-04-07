@@ -30,3 +30,20 @@ consumption(ConsumedAnimal, ConsumingAnimal, Freq) :-
     member(consumption(ConsumedAnimal, ConsumingAnimal, Freq),
            ConsumptionRelationships).
 
+% predators(Prey, Predators) is true if Predators is a list of animals that
+% consumed Prey, as described in "animal_consumption_relationships.csv".
+predators(Prey, Predators) :-
+    animal_consumption_relationships(ConsumptionRelationships),
+    predators_helper(Prey, ConsumptionRelationships, Predators).
+
+% predators(Prey, ConsumptionRelationships, Predators) is true if Predators is
+% a list of animals from ConsumptionRelationships that consume Prey.
+predators_helper(Prey, [], []).
+predators_helper(Prey,
+                 [consumption(Prey, Predator, _)|T1],
+                 [Predator|T2]) :-
+    predators_helper(Prey, T1, T2).
+predators_helper(Prey1, [consumption(Prey2, Predator, _)|T1], T2) :-
+    dif(Prey1, Prey2),
+    predators_helper(Prey1, T1, T2).
+
