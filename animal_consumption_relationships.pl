@@ -64,3 +64,13 @@ prey_helper(Predator1, [consumption(Prey, Predator2, _)|T1], T2) :-
     dif(Predator1, Predator2),
     prey_helper(Predator1, T1, T2).
 
+% append_without_duplicating(List1, List2, List3) is True if List3 is equal the result of adding all elements from List2 that are not already in List1, to the end of List1.
+append_without_duplicating(List1, [], List1).
+append_without_duplicating(List1, [H2|T2], List3) :-
+    member(H2, List1),
+    append_without_duplicating(List1, T2, List3).
+append_without_duplicating(List1, [H2|T2], List3) :-
+    not(member(H2, List1)),
+    append(List1, [H2], NewList1),
+    append_without_duplicating(NewList1, T2, List3).
+
