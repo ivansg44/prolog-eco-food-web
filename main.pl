@@ -71,7 +71,7 @@ animal_ok_helper(Animal,
 
 
 
-% available_energy_from_single_prey(Predator, Prey, Conusmedenergy) is true if the AvailableEnergy is 
+% available_energy_from_single_prey(Predator, Prey, AvailableEnergy) is true if the AvailableEnergy is 
 % equal to the TotalProducedEnergy*Freq given from the csv files.
 available_energy_from_single_prey(Predator, Prey, AvailableEnergy) :-
     total_energy_produced_csv(Prey, TotalProducedEnergy),
@@ -80,9 +80,9 @@ available_energy_from_single_prey(Predator, Prey, AvailableEnergy) :-
     
 
 
-% available_energy_list(Predator, PreyList, AvailableEnergy) is true if the Predator is matched up with
+% available_energy_list(Predator, AvailableEnergy) is true if the Predator is matched up with
 % all its prey and their available energy as calcualted from available_energy_from_single_prey predicate
-available_energy_list(Predator, PreyList, AvailableEnergyList) :-
+available_energy_list(Predator, AvailableEnergyList) :-
     prey(Predator, PreyList),
     available_energy_list_helper(Predator, PreyList, AvailableEnergyList).
 
@@ -95,8 +95,7 @@ available_energy_list_helper(Predator, [Prey|T1], [Energy|T2]) :-
 % sum_available_energy_list(Predator, TotalAvailableEnergy) is true if the TotalAvailableEnergy is the sum
 % of all the available energies from a predator's preylist
 sum_available_energy_list(Predator, TotalAvailableEnergy) :-
-    prey(Predator, PreyList),
-    available_energy_list(Predator, PreyList, AvailableEnergyList),
+    available_energy_list(Predator, AvailableEnergyList),
     sum(AvailableEnergyList, TotalAvailableEnergy).
 
 
@@ -106,6 +105,39 @@ max_allowable_abundance(Predator, MaxAbundance) :-
     consumed_energy(Predator, SingleEnergyRequirement),
     sum_available_energy_list(Predator, TotalAvailableEnergy),
     MaxAbundance is floor(TotalAvailableEnergy/SingleEnergyRequirement).
+
+
+
+% available_energy_from_new_abundance(Predator, (Prey,Abundance), AvailableEnergy) is true if the AvailableEnergy is 
+% equal to the Freq*Abundance*ProducedEnergy
+available_energy_new_abundance(Predator, (Prey,NewAbundance), AvailableEnergy) :-
+    total_energy_produced_by_abundance(Prey, NewAbundance, ProducedEnergy),
+    consumption(Prey, Predator, Freq),
+    AvailableEnergy is ProducedEnergy*Freq.
+
+
+% sum_energy_list_new_abundance(Predator, (Prey, Abundance), NewTotalAvailableEnergy) is true if the 
+% TotalAvailableEnergy is the sum of all the available energies from a predator's preylist with the old 
+% energy value removed and new energy value added
+sum_energy_list_new_abundance(Predator, (Prey, NewAbundance), NewTotalAvailableEnergy) :-
+    available_energy_from_single_prey(Predator, Prey, SubtractedEnergy),
+    available_energy_new_abundance(Predator, (Prey, NewAbundance), AddedEnergy),
+    available_energy_list(Predator, AvailableEnergyList),
+    sum(AvailableEnergyList, OldTotalAvailableEnergy),
+    NewTotalAvailableEnergy is (OldTotalAvailableEnergy-SubtractedEnergy+AddedEnergy).
+
+
+
+% max_allowable_abundance_with_new_entry(Predator, (Prey, NewAbundance), NewMaxAbundance) returns true
+% if MaxAbundance is equal to the TotalAvailableEnergy divided by the SingleEnergyRequirement (rounded down)
+% (Considers the new abundance in calcualating the TotalAvailableEnergy)
+max_allowable_abundance_with_new_entry(Predator, (Prey, NewAbundance), NewMaxAbundance) :-
+    consumed_energy(Predator, SingleEnergyRequirement),
+    sum_energy_list_new_abundance(Predator, (Prey, NewAbundance), TotalAvailableEnergy),
+    NewMaxAbundance is floor(TotalAvailableEnergy/SingleEnergyRequirement).
+
+
+
 
 
 
