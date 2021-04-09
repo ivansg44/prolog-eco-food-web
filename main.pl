@@ -179,3 +179,37 @@ sum([],0).
 sum([H|T],S) :-
     sum(T,ST),
     S is H+ST.
+
+cascading_abundance_changes(Animal,
+                            NewAbundance,
+                            CascadingAbundances) :-
+    predators(Animal, Predators),
+    cascading_abundance_changes_helper(Predators,
+                                       [(Animal, NewAbundance)],
+                                       CascadingAbundances).
+
+cascading_abundance_changes_helper([],
+                                   CascadingAbundances,
+                                   CascadingAbundances).
+cascading_abundance_changes_helper([H1|T1], Visited, CascadingAbundances) :-
+    predators(H1, P1),
+    max_allowable_abundance_with_new_entries(H1, Visited, A1),
+    append(Visited, [(H1, A1)], NewVisited),
+    remove_abundances_from_list(NewVisited, P1, FilteredVisited),
+    append_new_elements(T1, P1, NewToVisit),
+    cascading_abundance_changes_helper(NewToVisit,
+                                       FilteredVisited,
+                                       CascadingAbundances).
+
+remove_abundances_from_list([], _, []).
+remove_abundances_from_list([(Animal, _)|T1],
+                            AnimalsToFilter,
+                            FilteredAbundances) :-
+  member(Animal, AnimalsToFilter),
+  remove_abundances_from_list(T1, AnimalsToFilter, FilteredAbundances).
+remove_abundances_from_list([(Animal, Abundance)|T1],
+                            AnimalsToFilter,
+                            [(Animal, Abundance)|FilteredAbundances]) :-
+  not(member(Animal, AnimalsToFilter)),
+  remove_abundances_from_list(T1, AnimalsToFilter, FilteredAbundances).
+
