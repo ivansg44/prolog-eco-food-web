@@ -136,10 +136,27 @@ max_allowable_abundance_with_new_entry(Predator, (Prey, NewAbundance), NewMaxAbu
     sum_energy_list_new_abundance(Predator, (Prey, NewAbundance), TotalAvailableEnergy),
     NewMaxAbundance is floor(TotalAvailableEnergy/SingleEnergyRequirement).
 
+% max_recursive_predator_abundances(Prey, MaxRecursivePredatorAbundances) is
+% true if MaxRecursivePredatorAbundances is a list of
+% abundance(Predator, MaxAbundance) predicates, where Predator is a recursive
+% predator of Prey, and MaxAbundance is the maximum abundance of Predator given
+% the energy requirement of Predator, and the abundance of Prey described in
+% "animal_abundances.csv".
+max_recursive_predator_abundances(Prey, MaxRecursivePredatorAbundances) :-
+    recursive_predators(Prey, RecursivePredators),
+    max_recursive_predator_abundances_helper(RecursivePredators,
+                                             MaxRecursivePredatorAbundances).
 
-
-
-
+% max_recursive_predator_abundances_helper(RecursivePredators,
+% MaxRecursivePredatorAbundances) is true if MaxRecursivePredatorAbundances is
+% a list of abundance(Predator, Abundance) values corresponding to the list of
+% predators in RecursivePredators, and their max allowable abundances as per
+% their prey abundances described in "animal_abundances.csv".
+max_recursive_predator_abundances_helper([], []).
+max_recursive_predator_abundances_helper([H1|T1],
+                                         [abundance(H1, MaxAbundance)|T2]) :-
+    max_allowable_abundance(H1, MaxAbundance),
+    max_recursive_predator_abundances_helper(T1, T2).
 
 % From Lecture
 % sum(L,S) is true if S is the sum of the elements of numerical list L
