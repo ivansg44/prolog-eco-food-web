@@ -108,7 +108,7 @@ max_allowable_abundance(Predator, MaxAbundance) :-
 
 
 
-% available_energy_from_new_abundance(Predator, (Prey,Abundance), AvailableEnergy) is true if the AvailableEnergy is 
+% available_energy_new_abundance(Predator, (Prey,Abundance), AvailableEnergy) is true if the AvailableEnergy is 
 % equal to the Freq*Abundance*ProducedEnergy
 available_energy_new_abundance(Predator, (Prey,NewAbundance), AvailableEnergy) :-
     total_energy_produced_by_abundance(Prey, NewAbundance, ProducedEnergy),
@@ -116,24 +116,39 @@ available_energy_new_abundance(Predator, (Prey,NewAbundance), AvailableEnergy) :
     AvailableEnergy is ProducedEnergy*Freq.
 
 
-% sum_energy_list_new_abundance(Predator, (Prey, Abundance), NewTotalAvailableEnergy) is true if the 
+% sum_energy_list_new_abundances(Predator, (Prey, Abundance), NewTotalAvailableEnergy) is true if the 
 % TotalAvailableEnergy is the sum of all the available energies from a predator's preylist with the old 
 % energy value removed and new energy value added
-sum_energy_list_new_abundance(Predator, (Prey, NewAbundance), NewTotalAvailableEnergy) :-
-    available_energy_from_single_prey(Predator, Prey, SubtractedEnergy),
-    available_energy_new_abundance(Predator, (Prey, NewAbundance), AddedEnergy),
-    available_energy_list(Predator, AvailableEnergyList),
-    sum(AvailableEnergyList, OldTotalAvailableEnergy),
-    NewTotalAvailableEnergy is (OldTotalAvailableEnergy-SubtractedEnergy+AddedEnergy).
+sum_energy_list_new_abundances(Predator, ChangedPreyList, NewTotalAvailableEnergy) :-
+    available_energy_list(Predator, OriginalEnergyList),
+    delta_prey_energy_list(Predator, ChangedPreyList, DeltaEnergyList),
+    sum(OriginalEnergyList, OldTotalAvailableEnergy),
+    sum(DeltaEnergyList, DeltaEnergies),
+    NewTotalAvailableEnergy is OldTotalAvailableEnergy+DeltaEnergies.
+
+
+% delta_prey_energy_list(Predator, ChangedPreyList, DeltaEnergies) is true when DeltaEnergies is the AvailableEnergy from 
+% new abundances minus the 
+delta_prey_energy_list(Predator, [], []).
+delta_prey_energy_list(Predator, [(Prey, Abundance)|T1], [PreyDeltaEnergy|T2]) :-
+    prey(Predator, PreyList),
+    member(Prey, PreyList),
+    available_energy_from_single_prey(Predator, Prey, CSV_Energy),
+    available_energy_new_abundance(Predator, (Prey, Abundance), New_Energy),
+    PreyDeltaEnergy is New_Energy-CSV_Energy,
+    delta_prey_energy_list(Predator, T1, T2).
+delta_prey_energy_list(Predator, [(Prey, Abundance)|T1], [PreyDeltaEnergy|T2]) :-
+    PreyDeltaEnergy is 0,
+    delta_prey_energy_list(Predator, T1, T2).
 
 
 
-% max_allowable_abundance_with_new_entry(Predator, (Prey, NewAbundance), NewMaxAbundance) returns true
+% max_allowable_abundance_with_new_entries(Predator, (Prey, NewAbundance), NewMaxAbundance) returns true
 % if MaxAbundance is equal to the TotalAvailableEnergy divided by the SingleEnergyRequirement (rounded down)
 % (Considers the new abundance in calcualating the TotalAvailableEnergy)
-max_allowable_abundance_with_new_entry(Predator, (Prey, NewAbundance), NewMaxAbundance) :-
+max_allowable_abundance_with_new_entries(Predator, ChangedPreyList, NewMaxAbundance) :-
     consumed_energy(Predator, SingleEnergyRequirement),
-    sum_energy_list_new_abundance(Predator, (Prey, NewAbundance), TotalAvailableEnergy),
+    sum_energy_list_new_abundances(Predator, ChangedPreyList, TotalAvailableEnergy),
     NewMaxAbundance is floor(TotalAvailableEnergy/SingleEnergyRequirement).
 
 % max_recursive_predator_abundances(Prey, MaxRecursivePredatorAbundances) is
