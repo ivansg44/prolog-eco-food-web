@@ -64,16 +64,22 @@ prey_helper(Predator1, [consumption(Prey, Predator2, _)|T1], T2) :-
     dif(Predator1, Predator2),
     prey_helper(Predator1, T1, T2).
 
-/**
-recursive_predators(Prey, RecursivePredators) :-
-    predators(Prey, Predators),
-    recursive_predators_helper(Predators, Predators, RecursivePredators).
+% TODO Not sure how to describe this
+cascading_animals(Animal, CascadingAnimals) :-
+    predators(Animal, Predators),
+    cascading_animals_helper(Predators, [Animal], CascadingAnimals).
 
-% recursive_predators_helper(ToVisit, Visited, RecursivePredators)
-recursive_predators_helper([], _, []).
-recursive_predators_helper([H1|T1], Visited, RecursivePredators) :-
-**/
+% TODO cascading_animals_helper(ToVisit, Visited, CascadingAnimals)
+cascading_animals_helper([], CascadingAnimals, CascadingAnimals).
+cascading_animals_helper([H1|T1], Visited, CascadingAnimals) :-
+    predators(H1, P1),
+    append(Visited, [H1], NewVisited),
+    subtract_list(NewVisited, P1, FilteredVisited),
+    append_new_elements(T1, P1, NewToVisit),
+    cascading_animals_helper(NewToVisit, FilteredVisited, CascadingAnimals).
 
+% append_new_elements(List1, List2, List3) is true if List3 is equal to a list
+% of elements in List2 that were not already in List1 appended to List1.
 append_new_elements(List1, [], List1).
 append_new_elements(List1, [H2|T2], List3) :-
     member(H2, List1),
@@ -83,8 +89,6 @@ append_new_elements(List1, [H2|T2], List3) :-
     append(List1, [H2], NewList1),
     append_new_elements(NewList1, T2, List3).
 
-
-/**
 % recursive_predators(Prey, RecursivePredators) is true if RecursivePredators
 % is a list of animals higher up on the food chain than Prey.
 recursive_predators(Prey, RecursivePredators) :-
@@ -117,5 +121,4 @@ subtract_list([H1|T1], List2, List3) :-
 subtract_list([H1|T1], List2, [H1|List3]) :-
     not(member(H1, List2)),
     subtract_list(T1, List2, List3).
-**/
 
