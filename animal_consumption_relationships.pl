@@ -64,6 +64,27 @@ prey_helper(Predator1, [consumption(Prey, Predator2, _)|T1], T2) :-
     dif(Predator1, Predator2),
     prey_helper(Predator1, T1, T2).
 
+/**
+recursive_predators(Prey, RecursivePredators) :-
+    predators(Prey, Predators),
+    recursive_predators_helper(Predators, Predators, RecursivePredators).
+
+% recursive_predators_helper(ToVisit, Visited, RecursivePredators)
+recursive_predators_helper([], _, []).
+recursive_predators_helper([H1|T1], Visited, RecursivePredators) :-
+**/
+
+append_new_elements(List1, [], List1).
+append_new_elements(List1, [H2|T2], List3) :-
+    member(H2, List1),
+    append_new_elements(List1, T2, List3).
+append_new_elements(List1, [H2|T2], List3) :-
+    not(member(H2, List1)),
+    append(List1, [H2], NewList1),
+    append_new_elements(NewList1, T2, List3).
+
+
+/**
 % recursive_predators(Prey, RecursivePredators) is true if RecursivePredators
 % is a list of animals higher up on the food chain than Prey.
 recursive_predators(Prey, RecursivePredators) :-
@@ -96,4 +117,5 @@ subtract_list([H1|T1], List2, List3) :-
 subtract_list([H1|T1], List2, [H1|List3]) :-
     not(member(H1, List2)),
     subtract_list(T1, List2, List3).
+**/
 
