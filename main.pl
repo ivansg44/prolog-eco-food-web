@@ -184,6 +184,10 @@ max_recursive_predator_abundances_helper([H1|T1],
 % in the abundance of one animal.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% cascading_abundance_changes(Animal, NewAbundance, CascadingAbundances) is
+% true if CascadingAbundances is a list starting with abundance(Animal,
+% NewAbundance), followed by the new maximum abundances of all animals higher
+% on the food chain than Animal, given the new abundance of Animal.
 cascading_abundance_changes(Animal,
                             NewAbundance,
                             CascadingAbundances) :-
@@ -192,6 +196,10 @@ cascading_abundance_changes(Animal,
                                        [(Animal, NewAbundance)],
                                        CascadingAbundances).
 
+% cascading_abundance_changes_helper(ToVisit, Visited, CascadingAbundances)
+% iterates through the food web, while ensuring the maximum abundance of
+% each animal takes into account not only the changes to the original animal
+% whose abundance was changed, but other animals as well.
 cascading_abundance_changes_helper([],
                                    CascadingAbundances,
                                    CascadingAbundances).
@@ -205,6 +213,9 @@ cascading_abundance_changes_helper([H1|T1], Visited, CascadingAbundances) :-
                                        FilteredVisited,
                                        CascadingAbundances).
 
+% remove_abundances_from_list(Abundances, AnimalsToFilter, FilteredAbundances)
+% is true if FilteredAbundance is equal to Abundances, with all abundances of
+% animals in the list AnimalsToFilter removed.
 remove_abundances_from_list([], _, []).
 remove_abundances_from_list([(Animal, _)|T1],
                             AnimalsToFilter,
