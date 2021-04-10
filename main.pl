@@ -228,3 +228,38 @@ remove_abundances_from_list([(Animal, Abundance)|T1],
   not(member(Animal, AnimalsToFilter)),
   remove_abundances_from_list(T1, AnimalsToFilter, FilteredAbundances).
 
+% write_cascading_abundance_changes_to_csv(Animal, NewAbundance, Path) is true
+% if the cascading abundance changes of Animal and NewAbundance are written to
+% a csv file specified by Path, with unchanged Abundances from the original
+% file included as well.
+write_cascading_abundance_changes_to_csv(Animal, NewAbundance, Path) :-
+    animal_abundances(OldAbundances),
+    cascading_abundance_changes(Animal, NewAbundance, CascadingAbundances),
+    map_cascading_abundance_changes_to_rows(OldAbundances,
+                                            CascadingAbundances,
+                                            Rows),
+    csv_write_file(Path, [row('Animal', 'Abundance')|Rows]).
+
+% map_cascading_abundance_changes_to_rows(OldAbundances, CascadingAbundances,
+% Rows) is true if Rows is equal to a list of abundances represented by
+% OldAbundances, with two exceptions: the predice abundance is replaced with
+% row, and any abundances in CascadingAbundances will replace the values in
+% OldAbundances.
+map_cascading_abundance_changes_to_rows([], _, []).
+map_cascading_abundance_changes_to_rows([abundance(Animal,_)|T],
+                                        CascadingAbundances,
+                                        [row(Animal, NewAbundance)|
+                                         RemainingRows]) :-
+    member((Animal, NewAbundance), CascadingAbundances),
+    map_cascading_abundance_changes_to_rows(T,
+                                            CascadingAbundances,
+                                            RemainingRows).
+map_cascading_abundance_changes_to_rows([abundance(Animal,OldAbundance)|T],
+                                        CascadingAbundances,
+                                        [row(Animal, OldAbundance)|
+                                         RemainingRows]) :-
+    not(member((Animal, _), CascadingAbundances)),
+    map_cascading_abundance_changes_to_rows(T,
+                                            CascadingAbundances,
+                                            RemainingRows).
+
