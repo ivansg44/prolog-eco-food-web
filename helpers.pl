@@ -19,3 +19,10 @@ subtract_list([H1|T1], List2, [H1|List3]) :-
     not(member(H1, List2)),
     subtract_list(T1, List2, List3).
 
+% From Lecture
+% sum(L,S) is true if S is the sum of the elements of numerical list L
+sum([],0).
+sum([H|T],S) :-
+    sum(T,ST),
+    S is H+ST.
+

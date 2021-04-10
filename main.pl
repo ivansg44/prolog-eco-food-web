@@ -5,6 +5,13 @@
 :- [animal_consumption_relationships].
 :- [helpers].
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Queries for determining animal energy consumption and production using
+% individual animal energy needs described in animal_produced_energies and
+% animal_consumed energies, and total animal abundances described in
+% animal_abundances.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % total_energy_consumed_by(Animal, Total_Produced) is true if Animal is paired up
 % with the toal energy produced by a species from the csv
 % Total_Produced = Abundace*Produced
@@ -20,7 +27,6 @@ total_energy_produced_by_abundance(Animal, Abundance, Total_Produced) :-
     produced_energy(Animal, ProducedEnergy),
     Total_Produced is Abundance*ProducedEnergy.
 
-
 % total_energy_consumed_by(Animal, Total_Consumed) is true if Animal is paired up
 % with the toal energy consumed by a species from the csv
 % Total_Consumed = Abundace*ConsumedEnergy
@@ -35,6 +41,11 @@ total_energy_consumed_csv(Animal, Total_Consumed) :-
 total_energy_consumed_by_abundance(Animal, Abundance, Total_Consumed) :-
     produced_energy(Animal, ConsumedEnergy),
     Total_Consumed is Abundance*ConsumedEnergy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Queries for determining if all animals in the current system can survive,
+% given animal energy and production requirements, and animal abundances.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % system_ok is true if all animals in the system have enough animals to eat for
 % their energy requirements.
@@ -69,7 +80,10 @@ animal_ok_helper(Animal,
     total_energy_produced_csv(ConsumedAnimal, Total_Produced),
     animal_ok_helper(Animal, (RemainingEnergyReq-(Total_Produced*Freq)), T).
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Queries for determining maximum animal abundances possible, given animal
+% energy and production requirements, and animal abundances.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % available_energy_from_single_prey(Predator, Prey, AvailableEnergy) is true if the AvailableEnergy is 
 % equal to the TotalProducedEnergy*Freq given from the csv files.
@@ -77,8 +91,6 @@ available_energy_from_single_prey(Predator, Prey, AvailableEnergy) :-
     total_energy_produced_csv(Prey, TotalProducedEnergy),
     consumption(Prey, Predator, Freq),
     AvailableEnergy is TotalProducedEnergy*Freq.
-    
-
 
 % available_energy_list(Predator, AvailableEnergy) is true if the Predator is matched up with
 % all its prey and their available energy as calcualted from available_energy_from_single_prey predicate
@@ -106,15 +118,12 @@ max_allowable_abundance(Predator, MaxAbundance) :-
     sum_available_energy_list(Predator, TotalAvailableEnergy),
     MaxAbundance is floor(TotalAvailableEnergy/SingleEnergyRequirement).
 
-
-
 % available_energy_new_abundance(Predator, (Prey,Abundance), AvailableEnergy) is true if the AvailableEnergy is 
 % equal to the Freq*Abundance*ProducedEnergy
 available_energy_new_abundance(Predator, (Prey,NewAbundance), AvailableEnergy) :-
     total_energy_produced_by_abundance(Prey, NewAbundance, ProducedEnergy),
     consumption(Prey, Predator, Freq),
     AvailableEnergy is ProducedEnergy*Freq.
-
 
 % sum_energy_list_new_abundances(Predator, (Prey, Abundance), NewTotalAvailableEnergy) is true if the 
 % TotalAvailableEnergy is the sum of all the available energies from a predator's preylist with the old 
@@ -125,7 +134,6 @@ sum_energy_list_new_abundances(Predator, ChangedPreyList, NewTotalAvailableEnerg
     sum(OriginalEnergyList, OldTotalAvailableEnergy),
     sum(DeltaEnergyList, DeltaEnergies),
     NewTotalAvailableEnergy is OldTotalAvailableEnergy+DeltaEnergies.
-
 
 % delta_prey_energy_list(Predator, ChangedPreyList, DeltaEnergies) is true when DeltaEnergies is the AvailableEnergy from 
 % new abundances minus the 
@@ -140,8 +148,6 @@ delta_prey_energy_list(Predator, [(Prey, Abundance)|T1], [PreyDeltaEnergy|T2]) :
 delta_prey_energy_list(Predator, [(_, _)|T1], [PreyDeltaEnergy|T2]) :-
     PreyDeltaEnergy is 0,
     delta_prey_energy_list(Predator, T1, T2).
-
-
 
 % max_allowable_abundance_with_new_entries(Predator, (Prey, NewAbundance), NewMaxAbundance) returns true
 % if MaxAbundance is equal to the TotalAvailableEnergy divided by the SingleEnergyRequirement (rounded down)
@@ -173,12 +179,10 @@ max_recursive_predator_abundances_helper([H1|T1],
     max_allowable_abundance(H1, MaxAbundance),
     max_recursive_predator_abundances_helper(T1, T2).
 
-% From Lecture
-% sum(L,S) is true if S is the sum of the elements of numerical list L
-sum([],0).
-sum([H|T],S) :-
-    sum(T,ST),
-    S is H+ST.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Queries for determining cascading animal abundance changes, given a change
+% in the abundance of one animal.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cascading_abundance_changes(Animal,
                             NewAbundance,
