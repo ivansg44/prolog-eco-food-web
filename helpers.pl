@@ -1,5 +1,6 @@
 % append_new_elements(List1, List2, List3) is true if List3 is equal to a list
 % of elements in List2 that were not already in List1 appended to List1.
+% Try: append_new_elements([1,2,3], [4,1,5,2,6], List3).
 append_new_elements(List1, [], List1).
 append_new_elements(List1, [H2|T2], List3) :-
     member(H2, List1),
@@ -11,6 +12,7 @@ append_new_elements(List1, [H2|T2], List3) :-
 
 % subtract_list(List1, List2, List3) is True if List3 is List1 with all its
 % elements also found in List2 removed.
+% Try: subtract_list([1,2,3], [4,1,5,2,6], List3).
 subtract_list([], _, []).
 subtract_list([H1|T1], List2, List3) :-
     member(H1, List2),

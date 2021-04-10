@@ -49,6 +49,7 @@ total_energy_consumed_by_abundance(Animal, Abundance, Total_Consumed) :-
 
 % system_ok is true if all animals in the system have enough animals to eat for
 % their energy requirements.
+% Try: system_ok.
 system_ok :- animal_abundances(Abundances), system_ok_helper(Abundances).
 
 % system_ok_helper(Abundances) is true if all animals in the list of animal
@@ -60,6 +61,7 @@ system_ok_helper([abundance(Animal, _)|T]) :-
 
 % animal_ok(Animal) is true if Animal has enough animals to consume for its
 % energy requirements.
+% Try: animal_ok(rat).
 animal_ok(Animal) :-
     animal_consumption_relationships(ConsumptionRelationships),
     total_energy_consumed_csv(Animal, ConsumedEnergy),
@@ -188,6 +190,7 @@ max_recursive_predator_abundances_helper([H1|T1],
 % true if CascadingAbundances is a list starting with abundance(Animal,
 % NewAbundance), followed by the new maximum abundances of all animals higher
 % on the food chain than Animal, given the new abundance of Animal.
+% Try: cascading_abundance_changes(grasshopper, 10, CascadingAbundances).
 cascading_abundance_changes(Animal,
                             NewAbundance,
                             CascadingAbundances) :-
@@ -216,6 +219,7 @@ cascading_abundance_changes_helper([H1|T1], Visited, CascadingAbundances) :-
 % remove_abundances_from_list(Abundances, AnimalsToFilter, FilteredAbundances)
 % is true if FilteredAbundance is equal to Abundances, with all abundances of
 % animals in the list AnimalsToFilter removed.
+% Try: remove_abundances_from_list([(grasshopper,10), (eagle,20)], [grasshopper], CascadingAbundances).
 remove_abundances_from_list([], _, []).
 remove_abundances_from_list([(Animal, _)|T1],
                             AnimalsToFilter,
@@ -232,6 +236,7 @@ remove_abundances_from_list([(Animal, Abundance)|T1],
 % if the cascading abundance changes of Animal and NewAbundance are written to
 % a csv file specified by Path, with unchanged Abundances from the original
 % file included as well.
+% Try: write_cascading_abundance_changes_to_csv(grasshopper, 10, "foo.csv").
 write_cascading_abundance_changes_to_csv(Animal, NewAbundance, Path) :-
     animal_abundances(OldAbundances),
     cascading_abundance_changes(Animal, NewAbundance, CascadingAbundances),
