@@ -1,6 +1,7 @@
 % animal_consumption_relationship_csv_rows(Rows) is true if Rows is a list of
 % row(Animal, ConsumedBy, FrequencyOfConsumption) values corresponding to
 % "animal_consumption_relationships.csv".
+% Try: animal_consumption_relationship_csv_rows(Rows).
 animal_consumption_relationship_csv_rows(Rows) :-
     csv_read_file("animal_consumption_relationships.csv",
                   Rows,
@@ -10,6 +11,7 @@ animal_consumption_relationship_csv_rows(Rows) :-
 % ConsumptionsRelationships is a list of
 % consumption(ConsumedAnimal, ConsumingAnimal, Freq) values corresponding to
 % "animal_consumption_relationships.csv".
+% Try: animal_consumption_relationships(ConsumptionRelationships).
 animal_consumption_relationships(ConsumptionRelationships) :-
     animal_consumption_relationship_csv_rows(Rows),
     rows_to_consumption_relationships(Rows, ConsumptionRelationships).
@@ -19,6 +21,7 @@ animal_consumption_relationships(ConsumptionRelationships) :-
 % FrequencyOfConsumption) and consumption(ConsumedAnimal, ConsumingAnimal,
 % Freq) values corresponding to "animal_consumption_relationships.csv"
 % respectively.
+% Try: rows_to_consumption_relationships([row(unicorn, dragon, 0.5), row(pixies, unicorn, 0.9)], ConsumptionRelationships).
 rows_to_consumption_relationships([], []).
 rows_to_consumption_relationships([row(Animal,
                                        ConsumedBy,
@@ -31,6 +34,8 @@ rows_to_consumption_relationships([row(Animal,
 % consumption(ConsumedAnimal, ConsumingAnimal, Freq) is true if ConsumedAnimal
 % is consumed by ConsumingAnimal at a rate of Freq compared to other animals
 % that may consume it, as described in "animal_consumption_relationships.csv".
+% Try: consumption(rat, ConsumingAnimal, Freq).
+%      consumption(ConsumedAnimal, eagle, Freq).
 consumption(ConsumedAnimal, ConsumingAnimal, Freq) :-
     animal_consumption_relationships(ConsumptionRelationships),
     member(consumption(ConsumedAnimal, ConsumingAnimal, Freq),
@@ -38,6 +43,7 @@ consumption(ConsumedAnimal, ConsumingAnimal, Freq) :-
 
 % predators(Prey, Predators) is true if Predators is a list of animals that
 % consumed Prey, as described in "animal_consumption_relationships.csv".
+% Try: predators(rat, Predators).
 predators(Prey, Predators) :-
     animal_consumption_relationships(ConsumptionRelationships),
     predators_helper(Prey, ConsumptionRelationships, Predators).
@@ -55,6 +61,7 @@ predators_helper(Prey1, [consumption(Prey2, _, _)|T1], T2) :-
 
 % prey(Predator, Prey) is true if Prey is a list of animals that Prey consumes,
 % as described in "animal_consumption_relationships.csv".
+% Try: prey(eagle, Prey).
 prey(Predator, Prey) :-
     animal_consumption_relationships(ConsumptionRelationships),
     prey_helper(Predator, ConsumptionRelationships, Prey).
