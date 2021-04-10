@@ -3,7 +3,7 @@
 :- [animal_produced_energies].
 :- [animal_consumed_energies].
 :- [animal_consumption_relationships].
-
+:- [helpers].
 
 % total_energy_consumed_by(Animal, Total_Produced) is true if Animal is paired up
 % with the toal energy produced by a species from the csv
@@ -86,7 +86,7 @@ available_energy_list(Predator, AvailableEnergyList) :-
     prey(Predator, PreyList),
     available_energy_list_helper(Predator, PreyList, AvailableEnergyList).
 
-available_energy_list_helper(Predator, [], []).
+available_energy_list_helper(_, [], []).
 available_energy_list_helper(Predator, [Prey|T1], [Energy|T2]) :-
     available_energy_from_single_prey(Predator, Prey, Energy),
     available_energy_list_helper(Predator, T1, T2).
@@ -129,7 +129,7 @@ sum_energy_list_new_abundances(Predator, ChangedPreyList, NewTotalAvailableEnerg
 
 % delta_prey_energy_list(Predator, ChangedPreyList, DeltaEnergies) is true when DeltaEnergies is the AvailableEnergy from 
 % new abundances minus the 
-delta_prey_energy_list(Predator, [], []).
+delta_prey_energy_list(_, [], []).
 delta_prey_energy_list(Predator, [(Prey, Abundance)|T1], [PreyDeltaEnergy|T2]) :-
     prey(Predator, PreyList),
     member(Prey, PreyList),
@@ -137,7 +137,7 @@ delta_prey_energy_list(Predator, [(Prey, Abundance)|T1], [PreyDeltaEnergy|T2]) :
     available_energy_new_abundance(Predator, (Prey, Abundance), New_Energy),
     PreyDeltaEnergy is New_Energy-CSV_Energy,
     delta_prey_energy_list(Predator, T1, T2).
-delta_prey_energy_list(Predator, [(Prey, Abundance)|T1], [PreyDeltaEnergy|T2]) :-
+delta_prey_energy_list(Predator, [(_, _)|T1], [PreyDeltaEnergy|T2]) :-
     PreyDeltaEnergy is 0,
     delta_prey_energy_list(Predator, T1, T2).
 
