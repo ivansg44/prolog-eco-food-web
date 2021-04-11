@@ -28,3 +28,13 @@ sum([H|T],S) :-
     sum(T,ST),
     S is H+ST.
 
+% nonmember(Element, List) is true if the Element does not appear within the List
+% From: http://eclipseclp.org/doc/bips/lib/lists/nonmember-2.html
+nonmember(Arg,[Arg|_]) :-
+    !,
+    fail.
+nonmember(Arg,[_|Tail]) :-
+    !,
+    nonmember(Arg,Tail).
+nonmember(_,[]).
+
