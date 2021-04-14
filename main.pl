@@ -78,11 +78,13 @@ animal_ok_helper(_, RemainingEnergyReq, _) :- RemainingEnergyReq =< 0.
 animal_ok_helper(Animal1,
                  RemainingEnergyReq,
                  [consumption(_, Animal2, _)|T]) :-
+    RemainingEnergyReq >0,
     dif(Animal1, Animal2),
     animal_ok_helper(Animal1, RemainingEnergyReq, T).
 animal_ok_helper(Animal,
                  RemainingEnergyReq,
                  [consumption(ConsumedAnimal, Animal, Freq)|T]) :-
+    RemainingEnergyReq >0,
     total_energy_produced_csv(ConsumedAnimal, Total_Produced),
     animal_ok_helper(Animal, (RemainingEnergyReq-(Total_Produced*Freq)), T).
 
